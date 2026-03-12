@@ -20,4 +20,7 @@ tacho_i2c_data_t *i2c_slave_get_data(void);
 void i2c_slave_ev_irq(void);
 void i2c_slave_er_irq(void);
 
+void I2C1_EV_IRQHandler(void);
+void I2C1_ER_IRQHandler(void);
+
 #endif /* I2C_SLAVE_H */

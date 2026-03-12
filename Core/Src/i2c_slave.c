@@ -15,9 +15,6 @@ void i2c_slave_init(I2C_HandleTypeDef *hi2c)
 {
   i2c_handle = hi2c;
 
-  hi2c->Init.OwnAddress1 = (I2C_SLAVE_ADDR << 1);
-  HAL_I2C_Init(hi2c);
-
   i2c_data.sw_ver = I2C_SLAVE_SW_VER;
 
   hi2c->Instance->CR1 |= I2C_CR1_ACK | I2C_CR1_PE;
@@ -27,6 +24,16 @@ void i2c_slave_init(I2C_HandleTypeDef *hi2c)
 tacho_i2c_data_t *i2c_slave_get_data(void)
 {
   return &i2c_data;
+}
+
+void I2C1_EV_IRQHandler(void)
+{
+  i2c_slave_ev_irq();
+}
+
+void I2C1_ER_IRQHandler(void)
+{
+  i2c_slave_er_irq();
 }
 
 void i2c_slave_ev_irq(void)
