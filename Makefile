@@ -186,6 +186,9 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir $@		
 
+flash: $(BUILD_DIR)/$(TARGET).bin
+	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
+
 #######################################
 # clean up
 #######################################
@@ -196,5 +199,7 @@ clean:
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
+
+.PHONY: flash clean
 
 # *** EOF ***
