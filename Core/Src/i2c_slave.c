@@ -26,6 +26,11 @@ tacho_i2c_data_t *i2c_slave_get_data(void)
   return &i2c_data;
 }
 
+static void i2c_slave_update_data(void)
+{
+  i2c_data.digi_inputs = (uint8_t)(~GPIOA->IDR & 0xFFu);
+}
+
 void I2C1_EV_IRQHandler(void)
 {
   i2c_slave_ev_irq();
@@ -51,6 +56,7 @@ void i2c_slave_ev_irq(void)
       /* Slave transmitter: master wants to read from us */
       if (got_reg_addr == 0u)
       {
+        i2c_slave_update_data();
         memcpy(i2c_rd_buf, &i2c_data, sizeof(tacho_i2c_data_t));
       }
       if (reg_ptr >= struct_size)
@@ -86,6 +92,7 @@ void i2c_slave_ev_irq(void)
     if (got_reg_addr == 0u)
     {
       reg_ptr = (data < struct_size) ? data : 0u;
+      i2c_slave_update_data();
       memcpy(i2c_rd_buf, &i2c_data, sizeof(tacho_i2c_data_t));
       got_reg_addr = 1u;
     }
