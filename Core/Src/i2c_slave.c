@@ -153,7 +153,10 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
         (reg_ptr + write_byte_count) % (uint8_t)sizeof(tacho_i2c_data_t));
 
     i2c_wr_buf[target_offset] = rx_byte;
-    write_byte_count++;
+    if (write_byte_count < (uint8_t)sizeof(tacho_i2c_data_t))
+    {
+      write_byte_count++;
+    }
   }
 
   /* Keep receiving subsequent bytes */
@@ -251,16 +254,8 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     return;
   }
 
-  /* Ignore NACK on last byte of a read (expected) */
-  uint32_t err = HAL_I2C_GetError(hi2c);
-  if (err == HAL_I2C_ERROR_AF)
-  {
-    /* Normal NACK at end of master read -- restart listen */
-    HAL_I2C_EnableListen_IT(hi2c);
-    return;
-  }
-
-  /* For other errors, reset state and restart */
+  /* Reset state and restart listening for all errors,
+   * including HAL_I2C_ERROR_AF (expected NACK at end of master read). */
   is_write_transaction = 0u;
   write_byte_count     = 0u;
   snapshot_done        = 0u;
